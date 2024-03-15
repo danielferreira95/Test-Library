@@ -1,16 +1,15 @@
-import { AnyAction } from 'redux';
+// Esse reducer será responsável por tratar as informações da pessoa usuária
+import { SAVE_EMAIL } from '../actions';
 
-const initialState = {
+const INITIAL_STATE = {
   email: '',
-  password: '',
 };
 
-const userReducer = (state = initialState, action: AnyAction) => {
-  switch (action.type) {
-    case 'UPDATE_EMAIL':
+const userReducer = (state = INITIAL_STATE, { type, payload }: any) => {
+  switch (type) {
+    case SAVE_EMAIL:
       return {
-        ...state,
-        email: action.payload,
+        ...state, email: payload,
       };
     default:
       return state;

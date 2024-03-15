@@ -1,25 +1,38 @@
-import { GeneralExpensesType } from '../../types';
-import { success, SET_CURRENCIES } from '../actions';
+// Esse reducer será responsável por tratar o todas as informações relacionadas as despesas
+import { CURRENCY_SUCCESS, EXPENSE_CONSTRUCTOR, EXPENSE_DELETE } from '../actions';
+import { State } from '../types';
 
-const initialState = {
+const INITIAL_STATE: State = {
   currencies: [],
   expenses: [],
-  editor: false,
-  editorId: 0,
+  exchangeRates: {},
 };
 
-const walletReducer = (state = initialState, action: GeneralExpensesType) => {
-  switch (action.type) {
-    case SET_CURRENCIES: {
-      return { ...state, currencies: action.payload.currencies };
-    }
-    case success: {
-      const newState = {
-        ...state,
-        expenses: [...state.expenses, ...action.payload.expenses],
+interface IWalletData {
+  type: string,
+  payload: any,
+}
+
+const deleteExpense = (payload: any, state: any) => {
+  const { expenses } = state;
+  const deleteExpenses = expenses.filter((el: any) => el.id !== payload.id);
+  return deleteExpenses;
+};
+
+const walletReducer = (state = INITIAL_STATE, { type, payload }: IWalletData) => {
+  switch (type) {
+    case CURRENCY_SUCCESS:
+      return {
+        ...state, currencies: payload,
       };
-      return newState;
-    }
+    case EXPENSE_CONSTRUCTOR:
+      return {
+        ...state, expenses: [...state.expenses, payload],
+      };
+    case EXPENSE_DELETE:
+      return {
+        ...state, expenses: deleteExpense(payload, state),
+      };
     default:
       return state;
   }

@@ -1,67 +1,58 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import { updateEmail } from '../redux/actions/index';
+import { saveEmail } from '../redux/actions';
+import store from '../redux';
 
 function Login() {
-  const [mail, setMail] = useState('');
-  const [watchword, setWatchword] = useState('');
-  const [butOn, setButOn] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const MIN_CHARACTER = 6;
+  const REGEX_SPECIAL_CHAR = /^([a-z0-9]+(?:[._-][a-z0-9]+)*)@([a-z0-9]+(?:[.-][a-z0-9]+)*\.[a-z]{2,})$/;
+  // const REGEX_SPECIAL_CHAR = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const navigate = useNavigate();
 
-  const browsing = useNavigate();
-  const remittance = useDispatch();
-
-  const handleConect = (e: { preventDefault: () => void; }) => {
-    e.preventDefault();
-    remittance(updateEmail(mail));
-    browsing('/carteira');
+  const handleSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+    store.dispatch(saveEmail(email));
+    navigate('/carteira');
   };
 
-  const handleWatchword = (event: { target: { value: React
-    .SetStateAction<string>; }; }) => {
-    setWatchword(event.target.value);
+  const handleChangeEmail = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setEmail(event.target.value);
   };
 
-  const handleEmail = (event: { target: { value: React
-    .SetStateAction<string>; }; }) => {
-    setMail(event.target.value);
+  const handleChangePassword = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setPassword(event.target.value);
   };
-
-  useEffect(() => {
-    const loginRegex = /^[a-z0-9.]+@[a-z0-9]+\.[a-z]+(\.[a-z]+)?$/i;
-    const isMailValid = loginRegex.test(mail);
-    const isWatchwordValid = watchword.length >= 6;
-    setButOn(isMailValid && isWatchwordValid);
-  }, [mail, watchword]);
 
   return (
-    <div>
-      <form onSubmit={ handleConect }>
+    <>
+      <div>Login</div>
+      <form onSubmit={ handleSubmit }>
+        <label htmlFor="email">E-mail:</label>
         <input
           type="email"
-          name="email"
-          aria-label="Email"
           data-testid="email-input"
-          value={ mail }
-          onChange={ handleEmail }
+          name="email"
+          value={ email }
+          onChange={ handleChangeEmail }
         />
+        <label htmlFor="password">Senha:</label>
         <input
           type="password"
-          name="password"
-          aria-label="Senha:"
           data-testid="password-input"
-          value={ watchword }
-          onChange={ handleWatchword }
-          autoComplete="current-password"
+          name="password"
+          value={ password }
+          onChange={ handleChangePassword }
         />
         <button
           type="submit"
-          disabled={ !butOn }
+          disabled={ password.length < MIN_CHARACTER || !REGEX_SPECIAL_CHAR.test(email) }
         >
           Entrar
         </button>
       </form>
-    </div>
+    </>
   );
 }
 

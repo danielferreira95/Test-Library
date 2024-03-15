@@ -1,60 +1,34 @@
-import { DataType, Dispatch } from '../../types';
+import { IExpensive, Keys } from '../types';
+// import { getCurencyFormatInput } from '../../utils/servicesCurencies';
 
-export const UPDATE_EMAIL = 'UPDATE_EMAIL';
-export const SET_CURRENCY = 'SET_CURRENCY';
-export const SET_CURRENCIES = 'SET_CURRENCIES';
-const initial = 'INITIAL_REQUEST';
-export const success = 'SUCCESS_REQUEST';
-const failed = 'FAILED_REQUEST';
+// Action types
+export const SAVE_EMAIL = 'SAVE_EMAIL';
+export const CURRENCY_SUCCESS = 'CURRENCY_SUCCESS';
+export const CURRENCY_ERROR = 'CURRENCY_ERROR';
+export const EXPENSE_CONSTRUCTOR = 'EXPENSE_CONSTRUCTOR';
+export const EXPENSE_DELETE = 'EXPENSE_DELETE';
 
-export const setCurrencies = (data: string []) => ({
-  type: SET_CURRENCIES,
-  payload: { currencies: data },
+export const saveEmail = (currentEmail: any) => ({
+  type: SAVE_EMAIL,
+  payload: currentEmail,
 });
 
-export const updateEmail = (email: string) => ({
-  type: UPDATE_EMAIL,
-  payload: email,
+export const currencySuccess = (payload: Keys[]) => ({
+  type: CURRENCY_SUCCESS,
+  payload,
 });
 
-function initialRequest() {
-  return { type: initial };
-}
+export const currencyError = (payload: any) => ({
+  type: CURRENCY_ERROR,
+  payload,
+});
 
-function successRequest(data: DataType[]) {
-  return { type: success, payload: { expenses: data } };
-}
+export const expenseConstructor = (currentState: IExpensive) => ({
+  type: EXPENSE_CONSTRUCTOR,
+  payload: currentState,
+});
 
-function failledRequest(error: string) {
-  return { type: failed, payload: error };
-}
-
-export function fetchData(dataExpense: DataType[]) {
-  return async (dispatch: Dispatch) => {
-    try {
-      dispatch(initialRequest());
-      const response = await fetch('https://economia.awesomeapi.com.br/json/all');
-      const data = await response.json();
-
-      const updatedExpenses = dataExpense.map((expense) => ({
-        ...expense, exchangeRates: data }));
-      dispatch(successRequest(updatedExpenses));
-    } catch (error: any) {
-      dispatch(failledRequest(error.message));
-    }
-  };
-}
-
-export const callApi = () => {
-  return async (dispatch: Dispatch) => {
-    try {
-      const response = await fetch('https://economia.awesomeapi.com.br/json/all');
-      const data = await response.json();
-      console.log(data);
-      const currencies = Object.keys(data);
-      dispatch(setCurrencies(currencies));
-    } catch (error) {
-      console.error('Erro ao buscar moedas: ', error);
-    }
-  };
-};
+export const expenseDelete = (payload: any) => ({
+  type: EXPENSE_DELETE,
+  payload,
+});
