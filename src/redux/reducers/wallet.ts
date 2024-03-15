@@ -1,33 +1,28 @@
-import { AnyAction } from 'redux';
+import { GeneralExpensesType } from '../../types';
+import { success, SET_CURRENCIES } from '../actions';
 
 const initialState = {
-  totalExpense: 0,
-  exchangeRates: 0,
-  outgoing: [],
-  currency: 'BRL',
+  currencies: [],
+  expenses: [],
+  editor: false,
+  editorId: 0,
 };
 
-function calculateTotalExpense(outgoing) {
-  return outgoing.reduce((total, item) => total + item.expense, 0);
-}
-
-const walletReducer = (state = initialState, action: AnyAction) => {
+const walletReducer = (state = initialState, action: GeneralExpensesType) => {
   switch (action.type) {
-    case 'INITIAL_OUTGOING': {
-      const newOutgoing = [...state.outgoing, action.payload];
-      return {
-        ...state,
-        outgoing: newOutgoing,
-        totalExpense: calculateTotalExpense(newOutgoing),
-      };
+    case SET_CURRENCIES: {
+      return { ...state, currencies: action.payload.currencies };
     }
-    case 'SET_CURRENCY':
-      return {
+    case success: {
+      const newState = {
         ...state,
-        currency: action.payload,
+        expenses: [...state.expenses, ...action.payload.expenses],
       };
+      return newState;
+    }
     default:
       return state;
   }
 };
+
 export default walletReducer;

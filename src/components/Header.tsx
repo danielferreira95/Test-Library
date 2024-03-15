@@ -1,17 +1,33 @@
 import { useSelector } from 'react-redux';
-import { RootState } from '../types';
+import { RootState, LoginType, WalletType } from '../types';
+
+type InitialState = {
+  user: LoginType;
+  wallet: WalletType;
+};
 
 function Header() {
-  const mailContent = useSelector((state: RootState) => state.user.email);
-  const totalCost = useSelector((state: RootState) => state.wallet.totalExpense);
-  const coin = useSelector((state: RootState) => state.wallet.currency);
+  const { user, wallet } = useSelector((state: RootState) => state) as InitialState;
+
+  const calculateTotalExpense = wallet.expenses
+    ? wallet.expenses.reduce((total, item) => {
+      if (item.exchangeRates && item.currency && item.exchangeRates[item.currency]
+          && item.exchangeRates[item.currency].ask) {
+        const allExpeses = parseFloat(item.value)
+          * parseFloat(item.exchangeRates[item.currency].ask);
+        return total + allExpeses;
+      } return total;
+    }, 0)
+    : 0;
 
   return (
     <header>
       <h1>Trybewallet</h1>
-      <p data-testid="email-field">{`Email: ${mailContent}`}</p>
-      <p data-testid="total-field">{`Total: ${totalCost}`}</p>
-      <p data-testid="header-currency-field">{`${coin}`}</p>
+      <p data-testid="email-field">{`Email: ${user.email}`}</p>
+      <p data-testid="total-field">
+        {calculateTotalExpense.toFixed(2)}
+      </p>
+      <p data-testid="header-currency-field">BRL</p>
     </header>
   );
 }
